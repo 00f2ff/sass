@@ -17,8 +17,6 @@ const openai = new OpenAI({
   apiKey: OPEN_AI_KEY
 });
 
-console.log(openai)
-
 export async function sass(question: string) {
   const completion = await openai.chat.completions.create({
     messages: [
