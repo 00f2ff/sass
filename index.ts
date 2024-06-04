@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from "dotenv";
+import bodyParser from "body-parser";
 // import { main } from 'openaiClient';
 import OpenAI from "openai";
 
@@ -18,27 +19,36 @@ const openai = new OpenAI({
 
 console.log(openai)
 
-export async function main() {
+export async function sass(question: string) {
   const completion = await openai.chat.completions.create({
     messages: [
-      { role: "system", content: "You are a sassy assistant who responds to what people say to it in a sassy and sarcastic manner." },
-      { role: "user", content: "How do I use this self-checkout machine?" },
+      { role: "system", content: "You are a sassy assistant who responds to what people say to it in a sassy, sarcastic and passive-aggressive manner." },
+      { role: "user", content: question },
     ],
     model: "gpt-3.5-turbo",
   });
 
-  return completion.choices;
+  return completion.choices[0].message;
 }
 
 const app = express();
+app.use(bodyParser.json({ limit: "50mb" }));
 
-app.get('/', async (req, res) => {
-  const answer = await main();
-  console.log(answer)
-  res.send(answer);
+
+// Everything is the fault of the user
+app.post('/', async (req, res) => {
+  try {
+    console.log(req)
+    if (!req?.body?.question) {
+      throw new Error("Where yo question at?");
+    }
+    const answer = await sass(req.body.question);
+    res.send(answer);
+  } catch (e) {
+    // todo: type narrow on OpenAI error. Error message should read, "It's not me, it's you."
+    res.status(400).send((e as Error).message);
+  }
 });
-
-
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
