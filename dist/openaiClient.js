@@ -4,18 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.main = void 0;
-const express_1 = __importDefault(require("express"));
-const dotenv_1 = __importDefault(require("dotenv"));
 const openai_1 = __importDefault(require("openai"));
-dotenv_1.default.config();
-const PORT = process.env["PORT"] || 4000;
 const OPEN_AI_KEY = process.env["OPEN_AI_KEY"];
 if (!OPEN_AI_KEY)
     throw new Error("OPEN_AI_KEY must be defined");
 const openai = new openai_1.default({
     apiKey: OPEN_AI_KEY
 });
-console.log(openai);
 async function main() {
     const completion = await openai.chat.completions.create({
         messages: [
@@ -27,13 +22,4 @@ async function main() {
     return completion.choices;
 }
 exports.main = main;
-const app = (0, express_1.default)();
-app.get('/', async (req, res) => {
-    const answer = await main();
-    console.log(answer);
-    res.send(answer);
-});
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=openaiClient.js.map
